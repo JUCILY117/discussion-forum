@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRouter from './routes/auth.js';
-import prisma from './prismaClient.js';
+import threadRoutes from './routes/thread.js'
+import voteRoutes from './routes/vote.js';
 
 dotenv.config();
 const app = express();
@@ -11,6 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authRouter);
+app.use('/threads', threadRoutes);
+app.use('/vote', voteRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

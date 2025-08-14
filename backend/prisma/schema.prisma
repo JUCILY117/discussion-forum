@@ -21,6 +21,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   threads   Thread[]
+  Vote      Vote[]
 }
 
 model Thread {
@@ -31,4 +32,17 @@ model Thread {
   author      User     @relation(fields: [authorId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  Vote        Vote[]
+}
+
+model Vote {
+  id       Int @id @default(autoincrement())
+  userId   Int
+  threadId Int
+  value    Int
+
+  user   User   @relation(fields: [userId], references: [id])
+  thread Thread @relation(fields: [threadId], references: [id])
+
+  @@unique([userId, threadId])
 }
