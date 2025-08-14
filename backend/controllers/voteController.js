@@ -1,6 +1,6 @@
-import prisma from '../prismaClient.js';
+const prisma = require('../prismaClient.js');
 
-export const voteThread = async (req, res) => {
+const voteThread = async (req, res) => {
   const { threadId, value } = req.body;
   const userId = req.user.userId;
 
@@ -26,3 +26,5 @@ export const voteThread = async (req, res) => {
     console.log(err);
   }
 };
+
+module.exports = { voteThread };

@@ -1,6 +1,6 @@
-import express from 'express';
-import { register, login } from '../controllers/authController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+const express = require('express');
+const { register, login } = require('../controllers/authController.js');
+const authMiddleware = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.get('/me', authMiddleware, (req, res) => {
   res.json({ message: 'User info', user: req.user });
 });
 
-export default router;
+module.exports = router;

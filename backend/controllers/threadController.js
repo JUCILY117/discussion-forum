@@ -1,6 +1,6 @@
-import prisma from '../prismaClient.js';
+const prisma = require('../prismaClient.js');
 
-export const createThread = async (req, res) => {
+const createThread = async (req, res) => {
   const { title, description } = req.body;
   const authorId = req.user.userId;
 
@@ -14,7 +14,7 @@ export const createThread = async (req, res) => {
   }
 };
 
-export const getThreads = async (req, res) => {
+const getThreads = async (req, res) => {
   try {
     const threads = await prisma.thread.findMany({
       orderBy: { createdAt: 'desc' },
@@ -26,7 +26,7 @@ export const getThreads = async (req, res) => {
   }
 };
 
-export const getThreadById = async (req, res) => {
+const getThreadById = async (req, res) => {
   const { id } = req.params;
   try {
     const thread = await prisma.thread.findUnique({
@@ -40,7 +40,7 @@ export const getThreadById = async (req, res) => {
   }
 };
 
-export const deleteThread = async (req, res) => {
+const deleteThread = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.userId;
 
@@ -57,4 +57,11 @@ export const deleteThread = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete thread' });
   }
+};
+
+module.exports = {
+  createThread,
+  getThreads,
+  getThreadById,
+  deleteThread
 };
