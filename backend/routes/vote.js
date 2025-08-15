@@ -1,9 +1,9 @@
 import express from 'express';
 import authMiddleware from '../middleware/authMiddleware.js';
-import { voteThread } from '../controllers/voteController.js';
+import { vote } from '../controllers/voteController.js';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, voteThread);
+router.post('/', authMiddleware, vote);
 
 export default router;
