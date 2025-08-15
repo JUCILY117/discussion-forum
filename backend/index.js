@@ -16,6 +16,8 @@ app.use('/auth', authRouter);
 app.use('/threads', threadRoutes);
 app.use('/vote', voteRoutes);
 app.use('/replies', replyRoutes);
+app.use("/api", tagCategoryRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
