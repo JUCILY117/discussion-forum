@@ -1,6 +1,4 @@
-import {prismaClient} from "@prisma/client";
-
-const prisma= new prismaClient()
+import prisma from '../prismaClient.js';
 
 export const createTag = async(req,res)=>{
     try{

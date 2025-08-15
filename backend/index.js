@@ -5,6 +5,8 @@ import authRouter from './routes/auth.js';
 import threadRoutes from './routes/thread.js'
 import voteRoutes from './routes/vote.js';
 import replyRoutes from './routes/reply.js';
+import tagRoutes from './routes/tag.js';
+import categoryRoutes from './routes/category.js';
 
 dotenv.config();
 const app = express();
@@ -16,8 +18,8 @@ app.use('/auth', authRouter);
 app.use('/threads', threadRoutes);
 app.use('/vote', voteRoutes);
 app.use('/replies', replyRoutes);
-app.use("/api", tagCategoryRoutes);
-
+app.use("/tags", tagRoutes);
+app.use("/categories", categoryRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
