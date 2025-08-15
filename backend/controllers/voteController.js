@@ -1,11 +1,11 @@
-const prisma = require('../prismaClient.js');
+import prisma from "../prismaClient.js";
 
-const voteThread = async (req, res) => {
+export const voteThread = async (req, res) => {
   const { threadId, value } = req.body;
   const userId = req.user.userId;
 
   if (![1, -1].includes(value)) {
-    return res.status(400).json({ error: 'Invalid vote value' });
+    return res.status(400).json({ error: "Invalid vote value" });
   }
 
   try {
@@ -22,9 +22,7 @@ const voteThread = async (req, res) => {
 
     res.json({ vote, upvotes, downvotes });
   } catch (err) {
-    res.status(500).json({ error: 'Voting failed' });
+    res.status(500).json({ error: "Voting failed" });
     console.log(err);
   }
 };
-
-module.exports = { voteThread };
