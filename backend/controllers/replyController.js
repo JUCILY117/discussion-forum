@@ -1,4 +1,4 @@
-import prisma from '../prismaClient.js';
+import prisma from '../utils/prismaClient.js';
 
 export const createReply = async (req, res) => {
   const { threadId, content, parentReplyId } = req.body;

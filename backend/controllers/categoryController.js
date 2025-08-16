@@ -1,4 +1,4 @@
-import prisma from '../prismaClient.js';
+import prisma from '../utils/prismaClient.js';
 
 export const getCategories= async(req,res)=>{
     try{

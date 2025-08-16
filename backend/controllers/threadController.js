@@ -1,12 +1,13 @@
-import prisma from '../prismaClient.js';
+import prisma from '../utils/prismaClient.js';
+import { FilterService } from '../services/filterService.js';
 
 export const createThread = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, categoryId } = req.body;
   const authorId = req.user.userId;
 
   try {
     const thread = await prisma.thread.create({
-      data: { title, description, authorId },
+      data: { title, description, authorId, categoryId },
     });
     res.status(201).json(thread);
   } catch (err) {
@@ -16,10 +17,7 @@ export const createThread = async (req, res) => {
 
 export const getThreads = async (req, res) => {
   try {
-    const threads = await prisma.thread.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { author: { select: { id: true, name: true } } },
-    });
+    const threads = await FilterService.getFilteredThreads(req.query);
     res.json(threads);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch threads' });
