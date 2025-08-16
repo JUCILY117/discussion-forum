@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export const searchThreads = async (req, res) => {
   try {
-    const { q, filter, category, tags } = req.query;
+    const { q, filter, category, tags, page = 1, limit = 10 } = req.query;
 
     let whereClause = {};
 
@@ -43,22 +43,34 @@ export const searchThreads = async (req, res) => {
       };
     }
 
-    const threads = await prisma.thread.findMany({
-      where: whereClause,
-      include: {
-        author: { select: { id: true, name: true } },
-        category: true,
-        tags: {
-          include: { tag: true }
-        },
-        _count: {
-          select: { votes: true, replies: true }
-        }
-      },
-      orderBy: orderByClause
-    });
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
 
-    res.json(threads);
+    const [threads, total] = await Promise.all([
+      prisma.thread.findMany({
+        where: whereClause,
+        include: {
+          author: { select: { id: true, name: true } },
+          category: true,
+          tags: { include: { tag: true } },
+          _count: { select: { votes: true, replies: true } }
+        },
+        orderBy: orderByClause,
+        skip,
+        take
+      }),
+      prisma.thread.count({ where: whereClause })
+    ]);
+
+    res.json({
+      threads,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Something went wrong while searching threads' });
