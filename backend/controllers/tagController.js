@@ -26,3 +26,15 @@ export const getTags = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch tags' });
     }
 };
+export const deleteTag = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const tag = await prisma.tag.delete({
+            where: { id: Number(id) }
+        });
+        res.status(200).json(tag);
+    } catch (error) {
+        console.error('Error deleting tag:', error);
+        res.status(500).json({ error: 'Failed to delete tag' });
+    }
+};
