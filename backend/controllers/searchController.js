@@ -33,14 +33,13 @@ export const searchThreads = async (req, res) => {
     }
 
     let orderByClause = { createdAt: 'desc' };
+
     if (filter === 'recent') {
       orderByClause = { createdAt: 'desc' };
     } else if (filter === 'upvoted') {
-      orderByClause = {
-        votes: {
-          _count: 'desc'
-        }
-      };
+      orderByClause = { votes: { _count: 'desc' } };
+    } else if (filter === 'discussed') {
+      orderByClause = { replies: { _count: 'desc' } };
     }
 
     const skip = (Number(page) - 1) * Number(limit);
