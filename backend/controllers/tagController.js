@@ -16,16 +16,26 @@ export const createTag = async(req,res)=>{
     }
 };
 
-
 export const getTags = async (req, res) => {
-    try {
-        const tags = await prisma.tag.findMany();
-        res.status(200).json(tags);
-    } catch (error) {
-        console.error('Error fetching tags:', error);
-        res.status(500).json({ error: 'Failed to fetch tags' });
-    }
+  try {
+    const searchQuery = req.query.q || req.query.query || '';
+    const tags = await prisma.tag.findMany({
+      where: {
+        name: {
+          contains: searchQuery,
+          mode: 'insensitive',
+        },
+      },
+      orderBy: { name: 'asc' },
+      take: 20,
+    });
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    res.status(500).json({ error: 'Failed to fetch tags' });
+  }
 };
+
 export const deleteTag = async (req, res) => {
     const { id } = req.params;
     try {
