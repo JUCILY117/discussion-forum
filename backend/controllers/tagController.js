@@ -1,19 +1,24 @@
 import prisma from '../utils/prismaClient.js';
 
-export const createTag = async(req,res)=>{
-    try{
-        const {name}=req.body;
-        if (!name) return res.status(400).json({error: 'Tag name is required'});
+export const createTag = async (req, res) => {
+  try {
+    let { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Tag name is required' });
 
-        const existing= await prisma.tag.findUnique({where:{name}});
-        if (existing) return res.status(400).json({error: 'Tag already exists'});
+    const normalized = name.trim().toLowerCase();
 
-        const tag= await prisma.tag.create({data:{name}});
-        res.status(201).json(tag);
-    }catch(error){
-        console.error('Error creating tag:', error);
-        res.status(500).json({error: 'Failed to create tag'});
-    }
+    const existing = await prisma.tag.findFirst({
+      where: { name: { equals: normalized, mode: 'insensitive' } }
+    });
+
+    if (existing) return res.status(400).json({ error: 'Tag already exists' });
+
+    const tag = await prisma.tag.create({ data: { name: normalized } });
+    res.status(201).json(tag);
+  } catch (error) {
+    console.error('Error creating tag:', error);
+    res.status(500).json({ error: 'Failed to create tag' });
+  }
 };
 
 export const getTags = async (req, res) => {

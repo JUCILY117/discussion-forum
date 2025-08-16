@@ -15,7 +15,9 @@ export const createThread = async (req, res) => {
         tagNames.map(async (name) => {
           const normalized = name.trim().toLowerCase();
 
-          let existing = await prisma.tag.findUnique({ where: { name: normalized } });
+          let existing = await prisma.tag.findFirst({
+            where: { name: { equals: normalized, mode: 'insensitive' } }
+          });
           if (!existing) {
             existing = await prisma.tag.create({ data: { name: normalized } });
           }
@@ -104,9 +106,24 @@ export const addTagToThread = async (req, res) => {
     const thread = await prisma.thread.findUnique({ where: { id: parseInt(id) } });
     if (!thread) return res.status(404).json({ error: 'Thread not found' });
 
-    let tag = await prisma.tag.findUnique({ where: { name: normalized } });
+    let tag = await prisma.tag.findFirst({
+      where: { name: { equals: normalized, mode: 'insensitive' } }
+    });
     if (!tag) {
       tag = await prisma.tag.create({ data: { name: normalized } });
+    }
+
+    const alreadyAssigned = await prisma.threadTag.findUnique({
+      where: {
+        threadId_tagId: {
+          threadId: thread.id,
+          tagId: tag.id,
+        },
+      },
+    });
+
+    if (alreadyAssigned) {
+      return res.status(200).json({ message: "Tag already associated with thread", tag });
     }
 
     await prisma.threadTag.create({
@@ -139,9 +156,7 @@ export const removeTagFromThread = async (req, res) => {
     if (!existing) return res.status(404).json({ error: 'Tag association not found' });
 
     await prisma.threadTag.delete({
-      where: {
-        id: existing.id,
-      },
+      where: { id: existing.id },
     });
 
     res.json({ message: 'Tag removed from thread' });
