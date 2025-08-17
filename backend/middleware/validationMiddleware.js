@@ -9,6 +9,11 @@ export const validate = (schema, source = "body") => (req, res, next) => {
     }
     next();
   } catch (err) {
-    return res.status(400).json({ error: err.errors });
+    return res.status(400).json({
+      errors: err.issues.map(e => ({
+        field: e.path.join('.'),
+        message: e.message,
+      }))
+    });
   }
 };
