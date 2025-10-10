@@ -1,6 +1,10 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useRegisterMutation } from "../features/auth/authApi";
+import toast from "react-hot-toast";
+import Spinner from "../components/ui/Spinner";
 
 const containerVariant = {
   hidden: { opacity: 0, y: 40 },
@@ -9,6 +13,23 @@ const containerVariant = {
 
 export default function SignupPage() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+
+  const [register, { isLoading }] = useRegisterMutation();
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await register(form).unwrap();
+      toast.success("Registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.data?.message || "Registration failed. Try again.");
+    }
+  };
 
   const bgStyle = {
     backgroundColor: theme.background,
@@ -73,7 +94,7 @@ export default function SignupPage() {
         >
           <img
             src="https://cdn3d.iconscout.com/3d/premium/thumb/secure-login-3d-illustration-download-in-png-blend-fbx-gltf-file-formats--signup-password-protection-security-web-user-interface-pack-design-illustrations-5285487.png"
-            alt="Abstract login visual"
+            alt="Abstract signup visual"
             className="w-80 h-80 object-contain select-none pointer-events-none"
           />
         </motion.div>
@@ -97,24 +118,47 @@ export default function SignupPage() {
             love learning as much as you do.
           </p>
 
-          <form className="space-y-5">
-            <input type="text" placeholder="Full name" style={inputStyle} />
-            <input type="email" placeholder="Email address" style={inputStyle} />
-            <input type="password" placeholder="Password" style={inputStyle} />
+          <form onSubmit={onSubmit} className="space-y-5">
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={form.username}
+              onChange={onChange}
+              style={inputStyle}
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="username@domain"
+              value={form.email}
+              onChange={onChange}
+              style={inputStyle}
+              required
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••••••"
+              value={form.password}
+              onChange={onChange}
+              style={inputStyle}
+              required
+            />
 
             <motion.button
               type="submit"
-              className="w-full py-3 rounded-full font-extrabold mt-2"
+              className="w-full py-3 rounded-full font-extrabold mt-2 flex justify-center items-center gap-4"
               style={{
                 backgroundColor: theme.accent,
                 color: theme.surface,
               }}
-              whileHover={{
-                scale: 1.03,
-                backgroundColor: theme.accentHover,
-              }}
+              whileHover={{ scale: 1.03, backgroundColor: theme.accentHover }}
               whileTap={{ scale: 0.96 }}
+              disabled={isLoading}
             >
+              {isLoading && <Spinner size={20} color={theme.surface} />}
               Sign Up
             </motion.button>
           </form>
@@ -124,7 +168,8 @@ export default function SignupPage() {
             style={{ color: theme.textSecondary }}
           >
             Already have an account?{" "}
-            <Link to="/login"
+            <Link
+              to="/login"
               style={{ color: theme.accent }}
               className="hover:underline"
             >

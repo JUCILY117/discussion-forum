@@ -1,6 +1,10 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useLoginMutation } from "../features/auth/authApi";
+import toast from "react-hot-toast";
+import Spinner from "../components/ui/Spinner";
 
 const containerVariant = {
   hidden: { opacity: 0, y: 40 },
@@ -9,6 +13,22 @@ const containerVariant = {
 
 export default function LoginPage() {
   const { theme } = useTheme();
+  const [form, setForm] = useState({ emailOrUsername: "", password: "" });
+
+  const [login, { isLoading }] = useLoginMutation();
+
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(form).unwrap();
+      toast.success("Logged in successfully!");
+      window.location.href='/';
+    } catch (err) {
+      toast.error(err?.data?.message || "Login failed. Please try again.");
+    }
+  };
 
   const bgStyle = {
     backgroundColor: theme.background,
@@ -72,7 +92,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, x: 0, transition: { duration: 0.8 } }}
         >
           <img
-            src="https://cdn3d.iconscout.com/3d/premium/thumb/secure-login-3d-illustration-download-in-png-blend-fbx-gltf-file-formats--signup-password-protection-security-web-user-interface-pack-design-illustrations-5285487.png"
+            src="https://cdn3d.iconscout.com/3d/premium/thumb/online-login-5285491-4446423.png"
             alt="Abstract login visual"
             className="w-80 h-80 object-contain select-none pointer-events-none"
           />
@@ -96,31 +116,40 @@ export default function LoginPage() {
             Welcome back! Log in to continue exploring discussions and sharing your ideas.
           </p>
 
-          <form className="space-y-5">
+          <form onSubmit={onSubmit} className="space-y-5">
             <input
+              name="emailOrUsername"
               type="text"
               placeholder="Email or Username"
+              value={form.emailOrUsername}
+              onChange={onChange}
               style={inputStyle}
+              required
+              autoComplete="username"
             />
             <input
+              name="password"
               type="password"
-              placeholder="Password"
+              placeholder="••••••••••••"
+              value={form.password}
+              onChange={onChange}
               style={inputStyle}
+              required
+              autoComplete="current-password"
             />
 
             <motion.button
               type="submit"
-              className="w-full py-3 rounded-full font-extrabold mt-2"
+              className="w-full py-3 rounded-full font-extrabold mt-2 flex justify-center items-center gap-3"
               style={{
                 backgroundColor: theme.accent,
                 color: theme.surface,
               }}
-              whileHover={{
-                scale: 1.03,
-                backgroundColor: theme.accentHover,
-              }}
+              whileHover={{ scale: 1.03, backgroundColor: theme.accentHover }}
               whileTap={{ scale: 0.96 }}
+              disabled={isLoading}
             >
+              {isLoading && <Spinner size={20} color={theme.surface} />}
               Login
             </motion.button>
           </form>
@@ -130,7 +159,8 @@ export default function LoginPage() {
             style={{ color: theme.textSecondary }}
           >
             New to Thredd?{" "}
-            <Link to="/signup"
+            <Link
+              to="/signup"
               style={{ color: theme.accent }}
               className="hover:underline"
             >

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useTheme } from "../contexts/ThemeContext";
 import { FaHandsHelping } from "react-icons/fa";
-import { GiDiscussion } from "react-icons/gi";
+import { RiDiscussFill } from "react-icons/ri";
 import { BiSolidUpvote } from "react-icons/bi";
 
 const features = [
@@ -13,7 +13,7 @@ const features = [
   {
     title: "Start Discussions",
     desc: "Share ideas, career tips, or everyday curiosities with a friendly community.",
-    icon: <GiDiscussion />,
+    icon: <RiDiscussFill />,
   },
   {
     title: "Vote on Replies",
