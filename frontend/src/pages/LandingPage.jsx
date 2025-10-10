@@ -1,7 +1,5 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../contexts/ThemeContext";
-import Navbar from "../components/Navbar";
 import { FaHandsHelping } from "react-icons/fa";
 import { GiDiscussion } from "react-icons/gi";
 import { BiSolidUpvote } from "react-icons/bi";
@@ -97,8 +95,6 @@ export default function LandingPage() {
 
       <div className="pointer-events-none fixed top-[-150px] left-[-150px] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-400 blur-3xl opacity-50 animate-blob" />
       <div className="pointer-events-none fixed bottom-[-120px] right-[-100px] w-[350px] h-[350px] rounded-full bg-gradient-to-tr from-pink-400 via-purple-500 to-indigo-600 blur-3xl opacity-50 animate-blob animation-delay-2000" />
-
-      <Navbar />
 
       <motion.section
         className="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto px-6 md:px-12 py-24"

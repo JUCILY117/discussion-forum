@@ -6,21 +6,19 @@ import { MdDarkMode, MdLightMode } from "react-icons/md";
 
 export default function Navbar() {
   const { theme, toggleTheme, isDark } = useTheme();
-  const navigate = useNavigate(); // ✅ add navigate
-
+  const navigate = useNavigate();
   return (
     <header
       style={{
         backgroundColor: theme.surface,
         boxShadow: `0 2px 8px ${theme.shadow}`,
-        borderRadius: theme.borderRadius,
         color: theme.textPrimary,
       }}
       className="flex items-center justify-between px-8 py-6 sticky top-0 z-50 backdrop-blur-md select-none"
     >
       <div
         className="font-extrabold text-3xl cursor-pointer"
-        onClick={() => navigate("/")} // redirect home
+        onClick={() => navigate("/")}
       >
         Thredd
       </div>
