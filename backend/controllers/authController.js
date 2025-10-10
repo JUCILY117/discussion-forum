@@ -40,7 +40,14 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 3600000,
+    });
+
+    res.json({ user: { id: user.id, username: user.username, email: user.email } });
   } catch (err) {
     res.status(500).json({ error: 'Login failed' });
   }

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.js';
 import threadRoutes from './routes/thread.js'
 import voteRoutes from './routes/vote.js';
@@ -16,7 +17,9 @@ app.use(cors({
   origin : process.env.CLIENT_URL,
   credentials : true,
 }));
+
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/threads', threadRoutes);
