@@ -1,10 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 
 export default function Navbar() {
   const { theme, toggleTheme, isDark } = useTheme();
+  const navigate = useNavigate(); // ✅ add navigate
 
   return (
     <header
@@ -16,20 +18,35 @@ export default function Navbar() {
       }}
       className="flex items-center justify-between px-8 py-6 sticky top-0 z-50 backdrop-blur-md select-none"
     >
-      <div className="font-extrabold text-3xl cursor-default">
+      <div
+        className="font-extrabold text-3xl cursor-pointer"
+        onClick={() => navigate("/")} // redirect home
+      >
         Thredd
       </div>
+
       <nav className="flex items-center space-x-8 text-lg">
-        {["Home", "Threads", "Login"].map((link) => (
-          <a
-            key={link}
-            href="#"
+        {[
+          { name: "Home", path: "/" },
+          { name: "Threads", path: "/threads" },
+          { name: "Login", path: "/login" },
+        ].map((link) => (
+          <button
+            key={link.name}
+            onClick={() => navigate(link.path)}
             className="relative font-semibold hover:underline"
-            style={{ color: theme.textPrimary }}
+            style={{
+              color: theme.textPrimary,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
           >
-            {link}
-          </a>
+            {link.name}
+          </button>
         ))}
+
         <motion.button
           onClick={toggleTheme}
           aria-label="Toggle theme"
