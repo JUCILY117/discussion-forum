@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
-import { useGetUserQuery, useLogoutMutation } from "../features/auth/authApi";
+import { useLogoutMutation } from "../features/auth/authApi";
+import { useGetProfileQuery } from "../features/profile/profileApi";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { RiLogoutCircleLine } from "react-icons/ri";
 
@@ -9,7 +10,7 @@ export default function Navbar() {
   const { theme, toggleTheme, isDark } = useTheme();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const navigate = useNavigate();
-  const { data } = useGetUserQuery();
+  const { data } = useGetProfileQuery();
   
   const user = data?.user;
 

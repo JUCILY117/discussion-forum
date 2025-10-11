@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { useGetUserQuery } from "./features/auth/authApi";
 import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -9,6 +10,8 @@ import { Toaster } from "react-hot-toast";
 
 function InnerApp() {
   const { theme } = useTheme();
+  
+  useGetUserQuery();
 
   const toastStyle = {
     background: theme.surface,
@@ -24,7 +27,7 @@ function InnerApp() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="threads" element={<ThreadsPage />} />
+        <Route path="/threads" element={<ThreadsPage />} />
       </Routes>
       <Toaster
         toastOptions={{
