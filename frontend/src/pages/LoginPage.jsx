@@ -5,6 +5,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useLoginMutation } from "../features/auth/authApi";
 import toast from "react-hot-toast";
 import Spinner from "../components/ui/Spinner";
+import LoginLeftPanel from "../components/Auth/LoginLeftPanel";
 
 const containerVariant = {
   hidden: { opacity: 0, y: 40 },
@@ -12,7 +13,7 @@ const containerVariant = {
 };
 
 export default function LoginPage() {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const [form, setForm] = useState({ emailOrUsername: "", password: "" });
 
   const [login, { isLoading }] = useLoginMutation();
@@ -24,7 +25,7 @@ export default function LoginPage() {
     try {
       await login(form).unwrap();
       toast.success("Logged in successfully!");
-      window.location.href='/';
+      window.location.href='/threads';
     } catch (err) {
       toast.error(err?.data?.message || "Login failed. Please try again.");
     }
@@ -33,7 +34,7 @@ export default function LoginPage() {
   const bgStyle = {
     backgroundColor: theme.background,
     color: theme.textPrimary,
-    minHeight: "calc(100vh - 92px)",
+    minHeight: "calc(100vh - 88px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -53,14 +54,6 @@ export default function LoginPage() {
     overflow: "hidden",
   };
 
-  const leftPanel = {
-    background: theme.gradient,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "3rem 2rem",
-  };
-
   const rightPanel = {
     padding: "3rem 2.5rem",
     display: "flex",
@@ -76,6 +69,8 @@ export default function LoginPage() {
     padding: "0.8rem 1rem",
     width: "100%",
     transition: "border 0.25s",
+    outline: "none",
+    boxShadow: "none",
   };
 
   return (
@@ -86,17 +81,7 @@ export default function LoginPage() {
         initial="hidden"
         animate="visible"
       >
-        <motion.div
-          style={leftPanel}
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0, transition: { duration: 0.8 } }}
-        >
-          <img
-            src="https://cdn3d.iconscout.com/3d/premium/thumb/online-login-5285491-4446423.png"
-            alt="Abstract login visual"
-            className="w-80 h-80 object-contain select-none pointer-events-none"
-          />
-        </motion.div>
+        <LoginLeftPanel />
 
         <motion.div
           style={rightPanel}
@@ -107,7 +92,7 @@ export default function LoginPage() {
             className="text-3xl md:text-4xl font-extrabold mb-6"
             style={{ color: theme.textPrimary }}
           >
-            Sign in to Thredd
+            Sign in to <span style={{ color: theme.accent }}>Thredd</span>
           </h2>
           <p
             className="text-base mb-10"

@@ -1,17 +1,26 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
-import { useGetUserQuery } from "../features/auth/authApi";
+import { useGetUserQuery, useLogoutMutation } from "../features/auth/authApi";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
-
-const defaultAvatar = "https://ui-avatars.com/api/?name=User&background=random&size=64";
+import { RiLogoutCircleLine } from "react-icons/ri";
 
 export default function Navbar() {
   const { theme, toggleTheme, isDark } = useTheme();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useGetUserQuery();
-
+  const { data } = useGetUserQuery();
+  
   const user = data?.user;
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+      window.location.href="/login";
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   return (
     <header
@@ -32,7 +41,7 @@ export default function Navbar() {
           className="w-10 h-10 object-contain"
           draggable={false}
         />
-        <span style={{ color: theme.textPrimary }}>Thredd</span>
+        <span style={{ color: theme.accent }}>Thredd</span>
       </div>
 
       <nav className="flex items-center space-x-8 text-lg">
@@ -52,24 +61,34 @@ export default function Navbar() {
             {link.name}
           </button>
         ))}
-
-        {/* Show user info or login */}
         {user ? (
-          <div
-            className="flex items-center cursor-pointer space-x-3"
-            onClick={() => navigate("/profile")} // Pending profile page
-            title={`Logged in as ${user.username}`}
-          >
-            <img
-              src={user.avatar || defaultAvatar}
-              alt={`${user.username} avatar`}
-              className="w-8 h-8 rounded-full object-cover"
-              draggable={false}
-            />
-            <span style={{ color: theme.textPrimary, fontWeight: "600" }}>
-              {user.username}
-            </span>
-          </div>
+          <>
+            <div
+              className="flex items-center cursor-pointer space-x-3"
+              onClick={() => navigate("/profile")}
+              title={`Logged in as ${user.username}`}
+            >
+              <img
+                src={user.avatar || `https://ui-avatars.com/api/?name=${user.username}&background=random&size=64`}
+                alt={`${user.username} avatar`}
+                className="w-8 h-8 rounded-full object-cover"
+                draggable={false}
+              />
+              <span style={{ color: theme.textPrimary, fontWeight: "600" }}>
+                {user.username}
+              </span>
+            </div>
+            <motion.button
+              className="bg-transparent shadow-none border-none outline-none focus:outline-none cursor-pointer"
+              style={{ backgroundColor: "transparent", boxShadow: "none", border: "none" }}
+              whileHover={{ scale: 1.18 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={handleLogout} disabled={isLoggingOut}
+              title="Log Out"
+            >
+              <RiLogoutCircleLine  size={28} style={{ color: theme.accent }}/>
+            </motion.button>
+          </>
         ) : (
           <button
             onClick={() => navigate("/login")}
@@ -89,7 +108,7 @@ export default function Navbar() {
         <motion.button
           onClick={toggleTheme}
           aria-label="Toggle theme"
-          className="p-2 rounded-full bg-transparent shadow-none border-none outline-none focus:outline-none cursor-pointer"
+          className="rounded-full bg-transparent shadow-none border-none outline-none focus:outline-none cursor-pointer"
           style={{ backgroundColor: "transparent", boxShadow: "none", border: "none" }}
           whileHover={{ scale: 1.18 }}
           whileTap={{ scale: 0.92 }}

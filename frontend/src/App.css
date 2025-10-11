@@ -1,0 +1,11 @@
+/* Hide clear button in Chrome, Edge, Safari */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* Firefox */
+input[type="search"]::-moz-search-clear {
+  display: none;
+}

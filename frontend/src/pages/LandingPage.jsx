@@ -63,7 +63,7 @@ const floating = {
 };
 
 export default function LandingPage() {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   const bgStyle = {
     backgroundColor: theme.background,
@@ -78,16 +78,6 @@ export default function LandingPage() {
     boxShadow: `0 10px 25px ${theme.shadow}`,
     padding: theme.spacing,
     transition: "all 0.5s",
-  };
-
-  const headerStyle = {
-    backgroundColor: theme.surface,
-    boxShadow: `0 2px 8px ${theme.shadow}`,
-    borderRadius: theme.borderRadius,
-  };
-
-  const linkStyle = {
-    color: theme.textPrimary,
   };
 
   return (
@@ -181,23 +171,22 @@ export default function LandingPage() {
 
       <motion.section
         className="max-w-5xl mx-auto px-6 md:px-12 py-16 text-center select-none"
-        style={{
-            background: theme.surface,
-            borderRadius: theme.borderRadius,
-            boxShadow: `0 8px 32px ${theme.shadow}`,
-        }}
-        variants={sectionVariant}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        >
+          style={{
+              background: theme.surface,
+              borderRadius: theme.borderRadius,
+              boxShadow: `0 8px 32px ${theme.shadow}`,
+          }}
+          variants={sectionVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          >
         <h2
-            className="text-3xl font-extrabold mb-10"
-            style={{
-            color: "#cc4ac1ff",
-            opacity: 0.85,
-            textShadow: "0 2px 16px #fff2"
-            }}
+          className="text-3xl font-extrabold mb-10"
+          style={{
+          color: theme.textPrimary,
+          textShadow: "0 2px 16px #fff2"
+          }}
         >
             Popular Categories
         </h2>

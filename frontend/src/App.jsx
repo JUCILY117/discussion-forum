@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ThreadsPage from "./pages/ThreadsPage";
 import { Toaster } from "react-hot-toast";
 
 function InnerApp() {
@@ -23,6 +24,7 @@ function InnerApp() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="threads" element={<ThreadsPage />} />
       </Routes>
       <Toaster
         toastOptions={{

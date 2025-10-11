@@ -5,6 +5,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useRegisterMutation } from "../features/auth/authApi";
 import toast from "react-hot-toast";
 import Spinner from "../components/ui/Spinner";
+import SignupLeftPanel from "../components/Auth/SignupLeftPanel";
 
 const containerVariant = {
   hidden: { opacity: 0, y: 40 },
@@ -34,7 +35,7 @@ export default function SignupPage() {
   const bgStyle = {
     backgroundColor: theme.background,
     color: theme.textPrimary,
-    minHeight: "calc(100vh - 92px)",
+    minHeight: "calc(100vh - 88px)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -54,14 +55,6 @@ export default function SignupPage() {
     overflow: "hidden",
   };
 
-  const leftPanel = {
-    background: theme.gradient,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "3rem 2rem",
-  };
-
   const rightPanel = {
     padding: "3rem 2.5rem",
     display: "flex",
@@ -77,6 +70,8 @@ export default function SignupPage() {
     padding: "0.8rem 1rem",
     width: "100%",
     transition: "border 0.25s",
+    outline: "none",
+    boxShadow: "none",
   };
 
   return (
@@ -87,17 +82,7 @@ export default function SignupPage() {
         initial="hidden"
         animate="visible"
       >
-        <motion.div
-          style={leftPanel}
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0, transition: { duration: 0.8 } }}
-        >
-          <img
-            src="https://cdn3d.iconscout.com/3d/premium/thumb/secure-login-3d-illustration-download-in-png-blend-fbx-gltf-file-formats--signup-password-protection-security-web-user-interface-pack-design-illustrations-5285487.png"
-            alt="Abstract signup visual"
-            className="w-80 h-80 object-contain select-none pointer-events-none"
-          />
-        </motion.div>
+        <SignupLeftPanel />
 
         <motion.div
           style={rightPanel}
