@@ -39,7 +39,7 @@ export const createThread = async (req, res) => {
     const createdThreadWithTags = await prisma.thread.findUnique({
       where: { id: thread.id },
       include: {
-        author: { select: { id: true, name: true } },
+        author: { select: { id: true, username: true } },
         category: { select: { id: true, name: true } },
         tags: { include: { tag: true } },
       },
@@ -66,7 +66,7 @@ export const getThreadById = async (req, res) => {
   try {
     const thread = await prisma.thread.findUnique({
       where: { id: parseInt(id) },
-      include: { author: { select: { id: true, name: true } } },
+      include: { author: { select: { id: true, username: true } } },
     });
     if (!thread) return res.status(404).json({ error: 'Thread not found' });
     res.json(thread);

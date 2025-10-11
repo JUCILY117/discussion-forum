@@ -3,7 +3,7 @@ import prisma from '../utils/prismaClient.js';
 export class FilterService {
   
   static buildWhereConditions(filters) {
-    const { category, tags } = filters;
+    const { category, tags, search } = filters;
     const whereConditions = {};
 
     if (category) {
@@ -21,12 +21,19 @@ export class FilterService {
       };
     }
 
+    if (search) {
+      whereConditions.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
     return whereConditions;
   }
 
   static buildIncludeConditions() {
     return {
-      author: { select: { id: true, name: true } },
+      author: { select: { id: true, username: true } },
       category: { select: { id: true, name: true } },
       tags: { include: { tag: { select: { id: true, name: true } } } },
       votes: true
@@ -53,16 +60,25 @@ export class FilterService {
     return threads.sort((a, b) => b.voteScore - a.voteScore);
   }
 
-  static async getFilteredThreads(filters, pagination) {
+  static async getFilteredThreads(filters) {
     const { sort = 'recent', limit, page = 1 } = filters;
     
     const whereConditions = this.buildWhereConditions(filters);
     const includeConditions = this.buildIncludeConditions();
+
+    let orderBy;
+    if (sort === 'recent') {
+      orderBy = { createdAt: 'desc' };
+    } else if (sort === 'oldest') {
+      orderBy = { createdAt: 'asc' };
+    } else {
+      orderBy = { createdAt: 'desc' };
+    }
     
     const threads = await prisma.thread.findMany({
       where: whereConditions,
       include: includeConditions,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       take: limit ? parseInt(limit) : undefined,
       skip: limit ? (parseInt(page) - 1) * parseInt(limit) : undefined,
     });
