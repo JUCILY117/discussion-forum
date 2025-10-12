@@ -66,7 +66,7 @@ export const getThreadById = async (req, res) => {
   try {
     const thread = await prisma.thread.findUnique({
       where: { id: parseInt(id) },
-      include: { author: { select: { id: true, username: true } } },
+      include: { author: { select: { id: true, username: true } }, votes: true, tags: { include: { tag: true } }, category: true },
     });
     if (!thread) return res.status(404).json({ error: 'Thread not found' });
     res.json(thread);
