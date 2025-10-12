@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ThreadsPage from "./pages/ThreadsPage";
+import ViewThread from "./components/Threads/ViewThread";
 import { Toaster } from "react-hot-toast";
 
 function InnerApp() {
@@ -28,6 +29,7 @@ function InnerApp() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/threads" element={<ThreadsPage />} />
+        <Route path="/threads/:threadId" element={<ViewThread />} />
       </Routes>
       <Toaster
         toastOptions={{

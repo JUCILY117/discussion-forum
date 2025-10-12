@@ -46,7 +46,7 @@ export default function Navbar() {
       </div>
 
       <nav className="flex items-center space-x-8 text-lg">
-        {[{ name: "Home", path: "/" }, { name: "Threads", path: "/threads" }].map((link) => (
+        {[{ name: "Threads", path: "/threads" }].map((link) => (
           <button
             key={link.name}
             onClick={() => navigate(link.path)}
