@@ -3,7 +3,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { FaHandsHelping } from "react-icons/fa";
 import { RiDiscussFill } from "react-icons/ri";
 import { BiSolidUpvote } from "react-icons/bi";
-
+import { useNavigate } from "react-router-dom";
 const features = [
   {
     title: "Ask Anything",
@@ -64,6 +64,7 @@ const floating = {
 
 export default function LandingPage() {
   const { theme } = useTheme();
+  const navigate=useNavigate()
 
   const bgStyle = {
     backgroundColor: theme.background,
@@ -107,15 +108,15 @@ export default function LandingPage() {
             A forum for sharing questions, ideas, and knowledge — about anything and everything.
             Whether it's tech, lifestyle, science, or current events, be part of a welcoming community that learns and grows together.
           </p>
-          <motion.a
-            href="#"
-            className="inline-block rounded-full px-6 py-2 font-extrabold shadow-lg cursor-pointer select-none"
-            style={{ backgroundColor: theme.accent, color: theme.surface }}
-            whileHover={buttonHover(theme.accentHover)}
-            whileTap={{ scale: 0.95 }}
-          >
-            Get Started
-          </motion.a>
+          <motion.button
+             onClick={() => navigate("/login")}
+             className="inline-block rounded-full px-6 py-2 font-extrabold shadow-lg cursor-pointer select-none"
+             style={{ backgroundColor: theme.accent, color: theme.surface }}
+             whileHover={buttonHover(theme.accentHover)}
+             whileTap={{ scale: 0.95 }}
+           >
+             Get Started
+           </motion.button>
         </div>
         <motion.div
           className="flex-1 flex justify-center mt-16 md:mt-0"
