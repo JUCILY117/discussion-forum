@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../utils/prismaClient.js';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -42,9 +44,11 @@ const login = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
       maxAge: 3600000,
+      path: '/',
     });
 
     res.json({ user: { id: user.id, username: user.username, email: user.email } });
@@ -56,8 +60,10 @@ const login = async (req, res) => {
 const logout = (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
+    path: '/',
   });
   res.json({ message: 'Logged out successfully' });
 };
