@@ -25,23 +25,40 @@ export const createReply = async (req, res) => {
 
 export const getRepliesForThread = async (req, res) => {
   const { threadId } = req.params;
+
   try {
     const replies = await prisma.reply.findMany({
-      where: { threadId: parseInt(threadId), parentReplyId: null },
+      where: { threadId: parseInt(threadId) },
       include: {
-        author: { select: { id: true, name: true } },
-        childReplies: {
-          include: { author: { select: { id: true, name: true } } }
-        },
-        votes: true
+        author: { select: { id: true, name: true, username: true, avatar: true } },
+        votes: true,
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'asc' },
     });
-    res.json(replies);
+
+    const replyMap = {};
+    replies.forEach(reply => {
+      reply.childReplies = [];
+      replyMap[reply.id] = reply;
+    });
+
+    const rootReplies = [];
+    replies.forEach(reply => {
+      if (reply.parentReplyId) {
+        if (replyMap[reply.parentReplyId]) {
+          replyMap[reply.parentReplyId].childReplies.push(reply);
+        }
+      } else {
+        rootReplies.push(reply);
+      }
+    });
+
+    res.json(rootReplies);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch replies' });
   }
 };
+
 
 export const deleteReply = async (req, res) => {
   const { id } = req.params;
