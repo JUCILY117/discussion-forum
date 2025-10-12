@@ -18,7 +18,39 @@ export const threadApi = createApi({
       }
     }),
     getThreadById: builder.query({ query: (id) => `/threads/${id}`}),
+
+    createThread: builder.mutation({
+      query: (body) => ({
+        url: `/threads`,
+        method: 'POST',
+        body,
+      }),
+    }),
+
+    getCategories: builder.query({
+      query: () => '/categories',
+    }),
+
+    getTags: builder.query({
+      query: (q) => q ? `/tags?q=${encodeURIComponent(q)}` : `/tags`,
+    }),
+
+    createTag: builder.mutation({
+      query: (body) => ({
+        url: `/tags`,
+        method: 'POST',
+        body,
+      }),
+    }),
+
   }),
 });
 
-export const { useGetThreadsQuery, useGetThreadByIdQuery } = threadApi;
+export const {
+  useGetThreadsQuery,
+  useGetThreadByIdQuery,
+  useCreateThreadMutation,
+  useGetCategoriesQuery,
+  useGetTagsQuery,
+  useCreateTagMutation,
+} = threadApi;

@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import { useTheme } from "../contexts/ThemeContext";
 import { useGetThreadsQuery } from "../features/thread/threadApi";
 import ThreadCard from "../components/Threads/ThreadCard";
+import CreateThreadModal from "../components/CreateThreadModal";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { IoClose } from "react-icons/io5";
 
 export default function ThreadsPage() {
   const { theme } = useTheme();
-  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [filters, setFilters] = useState({
     category: "",
@@ -189,7 +189,7 @@ export default function ThreadsPage() {
 
         {user && (
           <motion.button
-            onClick={() => navigate("/threads/create")}
+            onClick={() => setShowCreateModal(true)}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             style={{
@@ -207,6 +207,11 @@ export default function ThreadsPage() {
           </motion.button>
         )}
       </motion.div>
+
+      <CreateThreadModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
 
       {isLoading && (
         <p style={{ color: theme.textSecondary, textAlign: "center" }}>

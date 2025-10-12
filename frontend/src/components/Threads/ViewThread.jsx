@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
+import { FaReply } from "react-icons/fa";
 import { useTheme } from "../../contexts/ThemeContext";
 import {
   useGetThreadQuery,
@@ -55,51 +56,53 @@ export default function ViewThread() {
 
   return (
     <motion.div
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  style={{
-    background: theme.surface,
-    color: theme.textPrimary,
-    width: "100%",
-    minHeight: "calc(100vh - 88px)",
-    transition: "background 0.4s, color 0.4s, border 0.4s",
-    borderRadius: 0,
-    boxShadow: "none",
-    margin: "0",
-    padding: "0",
-    display: "flex",
-    flexDirection: "column"
-  }}
->
-      <div style={{
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{
+        background: theme.surface,
+        color: theme.textPrimary,
+        width: "100%",
+        minHeight: "calc(100vh - 88px)",
+        transition: "background 0.4s, color 0.4s, border 0.4s",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "2rem",
-        flexWrap: "wrap",
-        padding: "2rem 2.5rem 1.2rem 2.5rem",
-        borderBottom: `1.5px solid ${theme.border}`,
-        transition: "background 0.4s, color 0.4s"
-      }}>
-        <span style={{
-          background: theme.gradient,
-          color: theme.textPrimary,
-          fontWeight: "700",
-          fontSize: "1rem",
-          padding: "5px 22px",
-          borderRadius: "18px"
-        }}>
+        flexDirection: "column"
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "2rem",
+          flexWrap: "wrap",
+          padding: "2rem 2.5rem 1.2rem 2.5rem",
+          borderBottom: `1.5px solid ${theme.border}`,
+        }}
+      >
+        <span
+          style={{
+            background: theme.gradient,
+            color: theme.textPrimary,
+            fontWeight: "700",
+            fontSize: "1rem",
+            padding: "5px 22px",
+            borderRadius: "18px",
+          }}
+        >
           {thread.category?.name}
         </span>
-        <span style={{
-          color: theme.textSecondary,
-          fontWeight: "500",
-          fontSize: "0.97rem"
-        }}>
-          Posted by <b style={{ color: theme.accent }}>{thread.author?.username}</b> • {new Date(thread.createdAt).toLocaleString()}
+        <span
+          style={{
+            color: theme.textSecondary,
+            fontWeight: "500",
+            fontSize: "0.97rem",
+          }}
+        >
+          Posted by <b style={{ color: theme.accent }}>{thread.author?.username}</b> •{" "}
+          {new Date(thread.createdAt).toLocaleString()}
         </span>
         <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", marginLeft: "auto" }}>
-          {thread.tags?.map(t => (
+          {thread.tags?.map((t) => (
             <span
               key={t.tag.id}
               style={{
@@ -110,7 +113,6 @@ export default function ViewThread() {
                 fontSize: "0.98rem",
                 border: `1px solid ${theme.accent}`,
                 fontWeight: "700",
-                marginLeft: "2px"
               }}
             >
               #{t.tag.name}
@@ -118,148 +120,147 @@ export default function ViewThread() {
           ))}
         </div>
       </div>
-
-      <div style={{
-        display: "flex",
-        alignItems: "flex-stretch",
-        width: "100%",
-        padding: "0",
-        transition: "background 0.4s, color 0.4s"
-      }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            background: theme.background,
-            padding: "2.2rem 1.4rem",
-            borderRight: `1.5px solid ${theme.border}`,
-            minWidth: "64px"
-          }}
-        >
-          <motion.button
-            onClick={() => handleVote(1)}
-            whileTap={{ scale: 1.2 }}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: theme.accent,
-            }}
-          >
-            <BiSolidUpvote size={34} />
-            <div style={{ fontSize: "1.14rem", fontWeight: 700, color: theme.textPrimary }}>
-              {upvotes > 0 ? upvotes : ''}
-            </div>
-          </motion.button>
-          <motion.button
-            onClick={() => handleVote(-1)}
-            whileTap={{ scale: 1.2 }}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "#ef4444",
-            }}
-          >
-            <BiSolidDownvote size={34} />
-            <div style={{ fontSize: "1.14rem", fontWeight: 700, color: "#ef4444" }}>
-              {downvotes > 0 ? downvotes : ''}
-            </div>
-          </motion.button>
-        </div>
-
-        <div style={{ flex: 1, padding: "2.2rem 3rem 1.4rem 2rem" }}>
+      <div className="pl-[4rem]">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          width: "100%",
+          padding: "2rem 3rem 1.4rem 2rem",
+        }}
+      >
+        <div style={{ flex: 1 }}>
           <h1
             style={{
               fontSize: "2.3rem",
               fontWeight: "900",
               color: theme.textPrimary,
               marginBottom: "1.0rem",
-              transition: "color 0.4s"
             }}
           >
             {thread.title}
           </h1>
-          <div style={{
-            fontSize: "1.15rem",
-            marginBottom: "2rem",
-            color: theme.textPrimary,
-            transition: "color 0.4s"
-          }}>
+          <div
+            style={{
+              fontSize: "1.15rem",
+              marginBottom: "2rem",
+              color: theme.textPrimary,
+            }}
+          >
             {thread.description}
           </div>
 
-          <form onSubmit={handleReply} style={{ marginBottom: "2.2rem" }}>
+          <form onSubmit={handleReply} >
             <textarea
               value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              rows={3}
+              onChange={(e) => {
+                setReplyContent(e.target.value);
+                e.target.style.height = "3rem";
+                e.target.style.height = e.target.scrollHeight + "px";
+              }}
               placeholder="Add a comment..."
               style={{
-                width: "100%",
-                background: theme.background,
+                width: "80%",
+                height: "3rem",
+                minHeight: "3rem",
+                background: "none",
                 border: `1px solid ${theme.border}`,
                 color: theme.textPrimary,
-                borderRadius: theme.borderRadius,
-                padding: "0.9rem",
-                resize: "vertical",
+                borderRadius: "25px",
+                padding: "0.7rem 1.5rem",
+                resize: "none",
+                overflow: "hidden",
                 outline: "none",
-                fontSize: "1.01rem",
-                transition: "background 0.4s, color 0.4s"
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
               }}
               required
             />
-            <motion.button
-              type="submit"
-              disabled={postingReply || !replyContent.trim()}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                marginTop: "0.4rem",
-                background: theme.accent,
-                color: theme.surface,
-                border: "none",
-                borderRadius: "18px",
-                padding: "0.54rem 1.45rem",
-                fontWeight: "700",
-                fontSize: "1rem",
-                cursor: postingReply ? "not-allowed" : "pointer"
-              }}
-            >
-              {postingReply ? "Posting..." : "Reply"}
-            </motion.button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.6rem", marginLeft: "0.8rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+                <motion.button
+                  onClick={() => handleVote(1)}
+                  whileTap={{ scale: 1.13 }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: theme.accent,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  <BiSolidUpvote size={20} />
+                  {upvotes > 0 ? <span>{upvotes}</span> : <span style={{ fontSize: "0.8rem" }}>Vote</span>}
+                </motion.button>
+
+                <motion.button
+                  onClick={() => handleVote(-1)}
+                  whileTap={{ scale: 1.13 }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#ef4444",
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  <BiSolidDownvote size={20} />
+                  {downvotes > 0 && <span>{downvotes}</span>}
+                </motion.button>
+              </div>
+              <motion.button
+                type="submit"
+                disabled={postingReply || !replyContent.trim()}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: theme.accent,
+                  cursor: postingReply ? "not-allowed" : "pointer",
+                  fontWeight: "600",
+                  fontSize: "0.95rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <FaReply size={15} />
+                <span>{postingReply ? "Posting..." : "Reply"}</span>
+              </motion.button>
+            </div>
           </form>
         </div>
       </div>
 
-      <div style={{
-        padding: "0 3rem 2.2rem 3rem",
-        width: "100%",
-        transition: "background 0.4s, color 0.4s"
-      }}>
-        <h3 style={{
-          margin: "1.7rem 0 1rem 0",
-          fontSize: "1.14rem",
-          fontWeight: 700,
-          color: theme.textPrimary,
-          transition: "color 0.4s"
-        }}>Comments</h3>
+      <div style={{ padding: "0 3rem 2.2rem 3rem", width: "100%" }}>
+        <h3
+          style={{
+            margin: "1.7rem 0 1rem 0",
+            fontSize: "1.14rem",
+            fontWeight: 700,
+            color: theme.textPrimary,
+          }}
+        >
+          Comments
+        </h3>
         {loadingReplies ? (
           <div style={{ color: theme.textSecondary }}>Loading replies...</div>
         ) : replies && replies.length > 0 ? (
           replies.map((reply) => (
-            <Reply
-              key={reply.id}
-              reply={reply}
-              threadId={threadId}
-              refetchReplies={refetch}
-              depth={0}
-            />
+            <Reply key={reply.id} reply={reply} threadId={threadId} refetchReplies={refetch} depth={0} />
           ))
         ) : (
           <div style={{ color: theme.textSecondary }}>No comments yet.</div>
         )}
+      </div>
       </div>
     </motion.div>
   );
