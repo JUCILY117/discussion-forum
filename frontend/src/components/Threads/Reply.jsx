@@ -183,40 +183,58 @@ export default function Reply({
               </div>
 
               {showReplyBox && (
-                <form onSubmit={handleReply} className="mt-2">
+                <div style={{ position: "relative", marginTop: "8px" }}>
                   <textarea
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="Reply..."
+                    placeholder="Add a comment…"
                     rows={2}
-                    className="w-full rounded-md p-2 resize-vertical outline-none text-sm"
+                    className="w-full rounded-3xl p-3 resize-vertical outline-none text-sm"
                     style={{
                       border: `1px solid ${theme.border}`,
-                      background: theme.background,
+                      background: theme.surface,
                       color: theme.textPrimary,
+                      fontSize: "1rem",
+                      marginBottom: "2px",
+                      minHeight: "44px",
                     }}
                     required
-                  />
-                  <motion.button
-                    type="submit"
-                    disabled={isLoading || !replyContent.trim()}
-                    style={{
-                      backgroundColor: theme.accent,
-                      color: theme.surface,
-                      border: "none",
-                      borderRadius: "18px",
-                      fontWeight: 700,
-                      cursor: isLoading ? "not-allowed" : "pointer",
-                      fontSize: "0.93rem"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey && replyContent.trim()) {
+                        e.preventDefault();
+                        handleReply(e);
+                      }
                     }}
-                    className="mt-2 px-4 py-1"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
+                  />
+                  <button
+                    type="button"
+                    disabled={isLoading || !replyContent.trim()}
+                    onClick={handleReply}
+                    style={{
+                      position: "absolute",
+                      right: "5px",
+                      bottom: "14px",
+                      background: "none",
+                      border: "none",
+                      color: theme.accent,
+                      fontWeight: 600,
+                      fontSize: "0.97rem",
+                      cursor: isLoading || !replyContent.trim() ? "not-allowed" : "pointer",
+                      opacity: isLoading || !replyContent.trim() ? 0.4 : 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "2px 10px",
+                      borderRadius: "16px",
+                      transition: "background 0.15s",
+                    }}
                   >
+                    <FaReply size={15} />
                     {isLoading ? "Replying..." : "Reply"}
-                  </motion.button>
-                </form>
+                  </button>
+                </div>
               )}
+
               {reply.childReplies?.length > 0 && (
                 <div className="mt-2">
                   {reply.childReplies.map((child, idx) => (

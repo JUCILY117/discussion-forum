@@ -16,7 +16,7 @@ import Reply from "./Reply";
 export default function ViewThread() {
   const { theme } = useTheme();
   const { threadId } = useParams();
-  const { data: thread, isLoading: loadingThread } = useGetThreadQuery(threadId);
+  const { data: thread, isLoading: loadingThread, refetch: refetchThread } = useGetThreadQuery(threadId);
   const { data: replies, isLoading: loadingReplies, refetch } = useGetRepliesQuery(threadId);
 
   const [vote] = useVoteMutation();
@@ -30,6 +30,7 @@ export default function ViewThread() {
       await vote({ threadId: Number(threadId), value }).unwrap();
       setVoteDiff(0);
       toast.success("Vote registered!");
+      refetchThread();
     } catch (err) {
       setVoteDiff((prev) => prev - value);
       toast.error(err?.data?.error || "Vote failed.");
@@ -180,6 +181,7 @@ export default function ViewThread() {
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.6rem", marginLeft: "0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
                 <motion.button
+                  type="button"
                   onClick={() => handleVote(1)}
                   whileTap={{ scale: 1.13 }}
                   style={{
@@ -198,6 +200,7 @@ export default function ViewThread() {
                 </motion.button>
 
                 <motion.button
+                  type="button"
                   onClick={() => handleVote(-1)}
                   whileTap={{ scale: 1.13 }}
                   style={{
