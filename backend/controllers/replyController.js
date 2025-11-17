@@ -71,7 +71,11 @@ export const deleteReply = async (req, res) => {
     if (!reply) return res.status(404).json({ error: 'Reply not found' });
     if (reply.authorId !== userId) return res.status(403).json({ error: 'Forbidden' });
 
-    await prisma.reply.delete({ where: { id: parseInt(id) } });
+    await prisma.reply.update({
+      where: { id: parseInt(id) },
+      data: { isDeleted: true, content: "This message was removed." }
+    });
+
     getIO().emit('reply-deleted', { replyId: parseInt(id), threadId: reply.threadId });
     res.json({ message: 'Reply deleted' });
   } catch (err) {
