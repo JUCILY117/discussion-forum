@@ -1,4 +1,5 @@
 import prisma from '../utils/prismaClient.js';
+import { getIO } from '../utils/socketServer.js';
 
 export const vote = async (req, res) => {
   const { threadId, replyId, value } = req.body;
@@ -40,6 +41,12 @@ export const vote = async (req, res) => {
     }
 
     res.json({ vote, ...counts });
+    
+    if (threadId) {
+      getIO().emit('thread-voted', { threadId, upvotes: counts.upvotes, downvotes: counts.downvotes });
+    } else if (replyId) {
+      getIO().emit('reply-voted', { replyId, upvotes: counts.upvotes, downvotes: counts.downvotes });
+    }
   } catch (err) {
     res.status(500).json({ error: 'Voting failed', details: err.message });
   }
