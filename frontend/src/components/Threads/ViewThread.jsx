@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaReply } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useSocket } from "../../contexts/SocketContext";
 import {
@@ -10,7 +11,9 @@ import {
   useGetRepliesQuery,
   useVoteMutation,
   useAddReplyMutation,
+  useDeleteThreadMutation,
 } from "../../features/threadView/threadViewApi";
+import { useGetProfileQuery } from "../../features/profile/profileApi";
 import toast from "react-hot-toast";
 import Reply from "./Reply";
 
@@ -19,12 +22,16 @@ export default function ViewThread() {
   const { threadId } = useParams();
   const { data: thread, isLoading: loadingThread, refetch: refetchThread } = useGetThreadQuery(threadId);
   const { data: replies, isLoading: loadingReplies, refetch } = useGetRepliesQuery(threadId);
+  const { data } = useGetProfileQuery();
+  const user = data?.user;
 
   const [vote] = useVoteMutation();
   const [addReply, { isLoading: postingReply }] = useAddReplyMutation();
   const [replyContent, setReplyContent] = useState("");
   const [voteDiff, setVoteDiff] = useState(0);
+  const [deleteThread] = useDeleteThreadMutation();
   const socket = useSocket();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket) return;
@@ -81,6 +88,18 @@ export default function ViewThread() {
       refetch();
     } catch (err) {
       toast.error(err?.data?.error || "Failed to reply.");
+    }
+  };
+
+  const handleDeleteThread = async () => {
+    if (!window.confirm("Are you sure you want to delete this thread?")) return;
+
+    try {
+      await deleteThread(threadId).unwrap();
+      toast.success("Thread deleted!");
+      navigate('/threads'); // or your thread list route
+    } catch (err) {
+      toast.error(err?.data?.error || "Failed to delete thread.");
     }
   };
 
@@ -155,6 +174,24 @@ export default function ViewThread() {
             </span>
           ))}
         </div>
+        { thread.author?.id === user?.id && (
+            <div
+              onClick={handleDeleteThread}
+              title="Delete Thread"
+              style={{
+                cursor: "pointer",
+                color: theme.accent,
+                marginLeft: "16px",
+                fontSize: "1.5rem",
+                transition: "color 0.3s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = theme.accentHover}
+              onMouseLeave={e => e.currentTarget.style.color = theme.accent}
+            >
+              <MdDeleteForever />
+            </div>
+        )}
+        
       </div>
       <div className="pl-[4rem]">
       <div
