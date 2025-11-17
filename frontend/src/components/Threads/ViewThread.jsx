@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaReply } from "react-icons/fa";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useSocket } from "../../contexts/SocketContext";
 import {
   useGetThreadQuery,
   useGetRepliesQuery,
@@ -23,6 +24,40 @@ export default function ViewThread() {
   const [addReply, { isLoading: postingReply }] = useAddReplyMutation();
   const [replyContent, setReplyContent] = useState("");
   const [voteDiff, setVoteDiff] = useState(0);
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("reply-posted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetch();
+      }
+    });
+
+    socket.on("reply-deleted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetch();
+      }
+    });
+
+    socket.on("thread-voted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetchThread();
+      }
+    });
+
+    socket.on("reply-voted", (data) => {
+      refetch();
+    });
+
+    return () => {
+      socket.off("reply-posted");
+      socket.off("reply-deleted");
+      socket.off("thread-voted");
+      socket.off("reply-voted");
+    };
+  }, [socket, threadId, refetch, refetchThread]);
 
   const handleVote = async (value) => {
     setVoteDiff((prev) => prev + value);

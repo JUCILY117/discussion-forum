@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { SocketProvider } from "./contexts/SocketContext";
 import { useGetUserQuery } from "./features/auth/authApi";
 import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
@@ -56,9 +57,11 @@ function InnerApp() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <InnerApp />
-    </ThemeProvider>
+    <SocketProvider>
+      <ThemeProvider>
+        <InnerApp />
+      </ThemeProvider>
+    </SocketProvider>
   );
 }
 
