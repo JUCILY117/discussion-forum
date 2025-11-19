@@ -12,7 +12,7 @@ export default async function adminMiddleware(req, res, next) {
     });
 
     if (!user || !user.isAdmin) {
-      return res.status(403).json({ error: 'Access Required' });
+      return res.status(403).json({ error: 'Access Denied. You do not have the required permissions.' });
     }
 
     next();
