@@ -13,11 +13,23 @@ export const threadViewApi = createApi({
     getReplies: builder.query({
       query: (threadId) => `/replies/thread/${threadId}`,
     }),
+    deleteThread: builder.mutation({
+      query: (id) => ({
+        url: `/threads/${id}`,
+        method: 'DELETE',
+      }),
+    }),
     addReply: builder.mutation({
       query: (body) => ({
         url: '/replies',
         method: 'POST',
         body,
+      }),
+    }),
+    deleteReply: builder.mutation({
+      query: (id) => ({
+        url: `/replies/${id}`,
+        method: 'DELETE',
       }),
     }),
     vote: builder.mutation({
@@ -35,4 +47,6 @@ export const {
   useGetRepliesQuery,
   useAddReplyMutation,
   useVoteMutation,
+  useDeleteThreadMutation,
+  useDeleteReplyMutation,
 } = threadViewApi;

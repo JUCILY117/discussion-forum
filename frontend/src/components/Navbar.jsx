@@ -10,13 +10,15 @@ export default function Navbar() {
   const { theme, toggleTheme, isDark } = useTheme();
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const navigate = useNavigate();
-  const { data } = useGetProfileQuery();
+  const isLoggedIn = Boolean(localStorage.getItem("isLoggedIn"));
+  const { data } = useGetProfileQuery(undefined, { skip: !isLoggedIn });
   
   const user = data?.user;
 
   const handleLogout = async () => {
     try {
       await logout().unwrap();
+      localStorage.removeItem("isLoggedIn");
       window.location.href="/login";
     } catch (error) {
       console.error("Logout failed", error);

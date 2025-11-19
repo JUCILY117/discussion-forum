@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaMinusCircle, FaPlusCircle, FaReply } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useVoteMutation, useAddReplyMutation } from "../../features/threadView/threadViewApi";
+import { useGetProfileQuery } from "../../features/profile/profileApi";
+import { useVoteMutation, useAddReplyMutation, useDeleteReplyMutation } from "../../features/threadView/threadViewApi";
 import toast from "react-hot-toast";
 
 export default function Reply({
@@ -20,6 +22,9 @@ export default function Reply({
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [voteDiff, setVoteDiff] = useState(0);
+  const [deleteReply] = useDeleteReplyMutation();
+  const { data } = useGetProfileQuery();
+  const user = data?.user;
 
   const upvotesCount = (reply.votes?.filter(v => v.value === 1).length || 0) + voteDiff;
   const downvotesCount = (reply.votes?.filter(v => v.value === -1).length || 0) - voteDiff;
@@ -47,6 +52,18 @@ export default function Reply({
       refetchReplies();
     } catch (err) {
       toast.error(err?.data?.error || "Failed to post reply.");
+    }
+  };
+
+  const handleDeleteReply = async () => {
+    if (!window.confirm("Are you sure you want to delete this reply?")) return;
+
+    try {
+      await deleteReply(reply.id).unwrap();
+      toast.success("Reply deleted!");
+      refetchReplies();
+    } catch (err) {
+      toast.error(err?.data?.error || "Failed to delete reply.");
     }
   };
 
@@ -122,101 +139,136 @@ export default function Reply({
               <div
                 style={{
                   fontSize: "1.01rem",
-                  color: theme.textPrimary,
+                  color: reply.content === "This message was removed." ? theme.textSecondary : theme.textPrimary,
+                  fontStyle: reply.content === "This message was removed." ? "italic" : "normal",
                   marginBottom: "8px",
                 }}
               >
                 {reply.content}
               </div>
-              <div className="flex items-center gap-2 mb-1">
-                <motion.button
-                  onClick={() => handleVote(1)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: theme.accent,
-                    cursor: "pointer",
-                    fontWeight: 700
-                  }}
-                  whileTap={{ scale: 1.13 }}
-                  className="flex items-center"
-                >
-                  <BiSolidUpvote size={19} />
-                  {upvotesCount > 0 ? (
-                    <span>{upvotesCount}</span>
-                  ) : (
-                    <span className="text-xs" style={{ fontSize: "0.77rem" }}>
-                      Vote
+              {reply.content !== "This message was removed." && (
+                <div className="flex items-center gap-2 mb-1">
+                  <motion.button
+                    onClick={() => handleVote(1)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: theme.accent,
+                      cursor: "pointer",
+                      fontWeight: 700
+                    }}
+                    whileTap={{ scale: 1.13 }}
+                    className="flex items-center"
+                  >
+                    <BiSolidUpvote size={19} />
+                    {upvotesCount > 0 ? (
+                      <span>{upvotesCount}</span>
+                    ) : (
+                      <span className="text-xs" style={{ fontSize: "0.77rem" }}>
+                        Vote
+                      </span>
+                    )}
+                  </motion.button>
+                  <motion.button
+                    onClick={() => handleVote(-1)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ef4444",
+                      cursor: "pointer",
+                      fontWeight: 700
+                    }}
+                    whileTap={{ scale: 1.13 }}
+                    className="flex items-center"
+                  >
+                    <BiSolidDownvote size={19} />
+                    {downvotesCount > 0 && <span>{downvotesCount}</span>}
+                  </motion.button>
+                  <button
+                    onClick={() => setShowReplyBox((v) => !v)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: theme.accent,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: "0.95rem"
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <FaReply size={15} />
+                    <span>{showReplyBox ? "Cancel" : "Reply"}</span>
+                  </button>
+                  {reply.author?.id === user?.id && reply.content !== "This message was removed." && (
+                    <span
+                      onClick={handleDeleteReply}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginLeft: "8px",
+                        color: theme.accent,
+                        cursor: "pointer"
+                      }}
+                      title="Delete Reply"
+                    >
+                      <MdDeleteForever size={20} />
                     </span>
                   )}
-                </motion.button>
-                <motion.button
-                  onClick={() => handleVote(-1)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#ef4444",
-                    cursor: "pointer",
-                    fontWeight: 700
-                  }}
-                  whileTap={{ scale: 1.13 }}
-                  className="flex items-center"
-                >
-                  <BiSolidDownvote size={19} />
-                  {downvotesCount > 0 && <span>{downvotesCount}</span>}
-                </motion.button>
-                <button
-                  onClick={() => setShowReplyBox((v) => !v)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: theme.accent,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: "0.95rem"
-                  }}
-                  className="flex items-center gap-1"
-                >
-                  <FaReply size={15} />
-                  <span>{showReplyBox ? "Cancel" : "Reply"}</span>
-                </button>
-              </div>
-
-              {showReplyBox && (
-                <form onSubmit={handleReply} className="mt-2">
+                </div>
+              )}
+              {showReplyBox && reply.content !== "This message was removed." && (
+                <div style={{ position: "relative", marginTop: "8px" }}>
                   <textarea
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="Reply..."
+                    placeholder="Add a comment…"
                     rows={2}
-                    className="w-full rounded-md p-2 resize-vertical outline-none text-sm"
+                    className="w-full rounded-3xl p-3 resize-vertical outline-none text-sm"
                     style={{
                       border: `1px solid ${theme.border}`,
-                      background: theme.background,
+                      background: theme.surface,
                       color: theme.textPrimary,
+                      fontSize: "1rem",
+                      marginBottom: "2px",
+                      minHeight: "44px",
                     }}
                     required
-                  />
-                  <motion.button
-                    type="submit"
-                    disabled={isLoading || !replyContent.trim()}
-                    style={{
-                      backgroundColor: theme.accent,
-                      color: theme.surface,
-                      border: "none",
-                      borderRadius: "18px",
-                      fontWeight: 700,
-                      cursor: isLoading ? "not-allowed" : "pointer",
-                      fontSize: "0.93rem"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey && replyContent.trim()) {
+                        e.preventDefault();
+                        handleReply(e);
+                      }
                     }}
-                    className="mt-2 px-4 py-1"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
+                  />
+                  <button
+                    type="button"
+                    disabled={isLoading || !replyContent.trim()}
+                    onClick={handleReply}
+                    style={{
+                      position: "absolute",
+                      right: "5px",
+                      bottom: "14px",
+                      background: "none",
+                      border: "none",
+                      color: theme.accent,
+                      fontWeight: 600,
+                      fontSize: "0.97rem",
+                      cursor: isLoading || !replyContent.trim() ? "not-allowed" : "pointer",
+                      opacity: isLoading || !replyContent.trim() ? 0.4 : 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "2px 10px",
+                      borderRadius: "16px",
+                      transition: "background 0.15s",
+                    }}
                   >
+                    <FaReply size={15} />
                     {isLoading ? "Replying..." : "Reply"}
-                  </motion.button>
-                </form>
+                  </button>
+                </div>
               )}
+
               {reply.childReplies?.length > 0 && (
                 <div className="mt-2">
                   {reply.childReplies.map((child, idx) => (

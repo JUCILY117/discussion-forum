@@ -1,28 +1,70 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaReply } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useSocket } from "../../contexts/SocketContext";
 import {
   useGetThreadQuery,
   useGetRepliesQuery,
   useVoteMutation,
   useAddReplyMutation,
+  useDeleteThreadMutation,
 } from "../../features/threadView/threadViewApi";
+import { useGetProfileQuery } from "../../features/profile/profileApi";
 import toast from "react-hot-toast";
 import Reply from "./Reply";
 
 export default function ViewThread() {
   const { theme } = useTheme();
   const { threadId } = useParams();
-  const { data: thread, isLoading: loadingThread } = useGetThreadQuery(threadId);
+  const { data: thread, isLoading: loadingThread, refetch: refetchThread } = useGetThreadQuery(threadId);
   const { data: replies, isLoading: loadingReplies, refetch } = useGetRepliesQuery(threadId);
+  const { data } = useGetProfileQuery();
+  const user = data?.user;
 
   const [vote] = useVoteMutation();
   const [addReply, { isLoading: postingReply }] = useAddReplyMutation();
   const [replyContent, setReplyContent] = useState("");
   const [voteDiff, setVoteDiff] = useState(0);
+  const [deleteThread] = useDeleteThreadMutation();
+  const socket = useSocket();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("reply-posted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetch();
+      }
+    });
+
+    socket.on("reply-deleted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetch();
+      }
+    });
+
+    socket.on("thread-voted", (data) => {
+      if (data.threadId === Number(threadId)) {
+        refetchThread();
+      }
+    });
+
+    socket.on("reply-voted", (data) => {
+      refetch();
+    });
+
+    return () => {
+      socket.off("reply-posted");
+      socket.off("reply-deleted");
+      socket.off("thread-voted");
+      socket.off("reply-voted");
+    };
+  }, [socket, threadId, refetch, refetchThread]);
 
   const handleVote = async (value) => {
     setVoteDiff((prev) => prev + value);
@@ -30,6 +72,7 @@ export default function ViewThread() {
       await vote({ threadId: Number(threadId), value }).unwrap();
       setVoteDiff(0);
       toast.success("Vote registered!");
+      refetchThread();
     } catch (err) {
       setVoteDiff((prev) => prev - value);
       toast.error(err?.data?.error || "Vote failed.");
@@ -45,6 +88,18 @@ export default function ViewThread() {
       refetch();
     } catch (err) {
       toast.error(err?.data?.error || "Failed to reply.");
+    }
+  };
+
+  const handleDeleteThread = async () => {
+    if (!window.confirm("Are you sure you want to delete this thread?")) return;
+
+    try {
+      await deleteThread(threadId).unwrap();
+      toast.success("Thread deleted!");
+      navigate('/threads'); // or your thread list route
+    } catch (err) {
+      toast.error(err?.data?.error || "Failed to delete thread.");
     }
   };
 
@@ -119,6 +174,24 @@ export default function ViewThread() {
             </span>
           ))}
         </div>
+        { thread.author?.id === user?.id && (
+            <div
+              onClick={handleDeleteThread}
+              title="Delete Thread"
+              style={{
+                cursor: "pointer",
+                color: theme.accent,
+                marginLeft: "16px",
+                fontSize: "1.5rem",
+                transition: "color 0.3s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = theme.accentHover}
+              onMouseLeave={e => e.currentTarget.style.color = theme.accent}
+            >
+              <MdDeleteForever />
+            </div>
+        )}
+        
       </div>
       <div className="pl-[4rem]">
       <div
@@ -180,6 +253,7 @@ export default function ViewThread() {
             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.6rem", marginLeft: "0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
                 <motion.button
+                  type="button"
                   onClick={() => handleVote(1)}
                   whileTap={{ scale: 1.13 }}
                   style={{
@@ -198,6 +272,7 @@ export default function ViewThread() {
                 </motion.button>
 
                 <motion.button
+                  type="button"
                   onClick={() => handleVote(-1)}
                   whileTap={{ scale: 1.13 }}
                   style={{

@@ -1,4 +1,5 @@
 import prisma from '../utils/prismaClient.js';
+import { getIO } from '../utils/socketServer.js';
 
 export const createReply = async (req, res) => {
   const { threadId, content, parentReplyId } = req.body;
@@ -17,6 +18,7 @@ export const createReply = async (req, res) => {
         parentReplyId: parentReplyId || null
       },
     });
+    getIO().emit('reply-posted', { threadId: reply.threadId, reply: reply });
     res.status(201).json(reply);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create reply' });
@@ -69,7 +71,12 @@ export const deleteReply = async (req, res) => {
     if (!reply) return res.status(404).json({ error: 'Reply not found' });
     if (reply.authorId !== userId) return res.status(403).json({ error: 'Forbidden' });
 
-    await prisma.reply.delete({ where: { id: parseInt(id) } });
+    await prisma.reply.update({
+      where: { id: parseInt(id) },
+      data: { isDeleted: true, content: "This message was removed." }
+    });
+
+    getIO().emit('reply-deleted', { replyId: parseInt(id), threadId: reply.threadId });
     res.json({ message: 'Reply deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete reply' });
