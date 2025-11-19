@@ -24,6 +24,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(form).unwrap();
+      localStorage.setItem("isLoggedIn", "true");
       toast.success("Logged in successfully!");
       window.location.href='/threads';
     } catch (err) {

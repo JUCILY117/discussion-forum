@@ -12,8 +12,9 @@ import { Toaster } from "react-hot-toast";
 
 function InnerApp() {
   const { theme } = useTheme();
-  
-  useGetUserQuery();
+  const isLoggedIn = Boolean(localStorage.getItem("isLoggedIn"));
+
+  const userQuery = useGetUserQuery(undefined, { skip: !isLoggedIn });
 
   const toastStyle = {
     background: theme.surface,
