@@ -40,6 +40,12 @@ export const authApi = createApi({
         body,
       }),
     }),
+    checkUsername: builder.query({
+      query: (username) => `/auth/check-username?username=${username}`,
+    }),
+    checkEmail: builder.query({
+      query: (email) => `/auth/check-email?email=${email}`,
+    }),
     logout: builder.mutation({
       query: () => ({
         url: '/auth/logout',
@@ -52,4 +58,4 @@ export const authApi = createApi({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetUserQuery, useLogoutMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetUserQuery, useLogoutMutation, useLazyCheckUsernameQuery, useLazyCheckEmailQuery } = authApi;

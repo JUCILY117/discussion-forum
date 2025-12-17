@@ -1,12 +1,13 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, Link } from "react-router-dom";
-import { useTheme } from "../contexts/ThemeContext";
-import { useRegisterMutation } from "../features/auth/authApi";
+import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import Spinner from "../components/ui/Spinner";
+import { Link, useNavigate } from "react-router-dom";
 import SignupLeftPanel from "../components/Auth/SignupLeftPanel";
-
+import Spinner from "../components/ui/Spinner";
+import { useTheme } from "../contexts/ThemeContext";
+import { useLazyCheckEmailQuery, useLazyCheckUsernameQuery, useRegisterMutation, } from "../features/auth/authApi";
+import { useAvailabilityCheck } from "../hooks/useAvailabilityCheck";
 const containerVariant = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
@@ -18,11 +19,34 @@ export default function SignupPage() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
 
   const [register, { isLoading }] = useRegisterMutation();
-
+  
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const [checkUsername] = useLazyCheckUsernameQuery();
+  const [checkEmail] = useLazyCheckEmailQuery();
 
+  const usernameStatus = useAvailabilityCheck({
+    value: form.username,
+    checkFn: checkUsername,
+    minLength: 3,
+  });
+
+  const emailStatus = useAvailabilityCheck({
+    value: form.email,
+    checkFn: checkEmail,
+    minLength: 5,
+  });
+    
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (usernameStatus === "taken") {
+      toast.error("Username is already taken");
+      return;
+    }
+
+    if (emailStatus === "taken") {
+      toast.error("Email is already registered");
+      return;
+    }
     try {
       await register(form).unwrap();
       toast.success("Registered successfully!");
@@ -104,24 +128,111 @@ export default function SignupPage() {
           </p>
 
           <form onSubmit={onSubmit} className="space-y-5">
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={form.username}
-              onChange={onChange}
-              style={inputStyle}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="username@domain"
-              value={form.email}
-              onChange={onChange}
-              style={inputStyle}
-              required
-            />
+            <div className="relative space-y-1">
+              {usernameStatus !== "idle" && usernameStatus !== "checking" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute -top-5 left-1 text-xs font-semibold"
+                  style={{
+                    color:
+                      usernameStatus === "available"
+                        ? "#22c55e"
+                        : "#ef4444",
+                  }}
+                >
+                  {usernameStatus === "available"
+                    ? "Username available"
+                    : "Username already taken"}
+                </motion.div>
+              )}
+
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={form.username}
+                onChange={onChange}
+                style={{
+                  ...inputStyle,
+                  paddingRight: "2.75rem",
+                  border:
+                    usernameStatus === "available"
+                      ? "1px solid #22c55e"
+                      : usernameStatus === "taken"
+                      ? "1px solid #ef4444"
+                      : inputStyle.border,
+                }}
+                required
+              />
+
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {usernameStatus === "checking" && (
+                  <Loader2 size={18} className="animate-spin text-gray-400" />
+                )}
+
+                {usernameStatus === "available" && (
+                  <CheckCircle size={18} className="text-green-500" />
+                )}
+
+                {usernameStatus === "taken" && (
+                  <XCircle size={18} className="text-red-500" />
+                )}
+              </div>
+            </div>
+
+            <div className="relative space-y-1">
+              {emailStatus !== "idle" && emailStatus !== "checking" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute -top-5 left-1 text-xs font-semibold"
+                  style={{
+                    color:
+                      emailStatus === "available"
+                        ? "#22c55e"
+                        : "#ef4444",
+                  }}
+                >
+                  {emailStatus === "available"
+                    ? "Email available"
+                    : "Email already registered"}
+                </motion.div>
+              )}
+
+              <input
+                type="email"
+                name="email"
+                placeholder="username@domain"
+                value={form.email}
+                onChange={onChange}
+                style={{
+                  ...inputStyle,
+                  paddingRight: "2.75rem",
+                  border:
+                    emailStatus === "available"
+                      ? "1px solid #22c55e"
+                      : emailStatus === "taken"
+                      ? "1px solid #ef4444"
+                      : inputStyle.border,
+                }}
+                required
+              />
+
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {emailStatus === "checking" && (
+                  <Loader2 size={18} className="animate-spin text-gray-400" />
+                )}
+                {emailStatus === "available" && (
+                  <CheckCircle size={18} className="text-green-500" />
+                )}
+                {emailStatus === "taken" && (
+                  <XCircle size={18} className="text-red-500" />
+                )}
+              </div>
+            </div>
             <input
               type="password"
               name="password"
