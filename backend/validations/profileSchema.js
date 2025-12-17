@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const updateProfileSchema = z.object({
   name: z.string().min(1, 'Name cannot be empty').max(100).optional().transform(val => val?.trim()),
   username: z.string().min(2, 'Username must be at least 2 characters').max(30).optional().transform(val => val?.trim()),
+  email: z.string().email("Invalid email format").optional().transform((val) => val?.trim().toLowerCase()),
   avatar: z.string().url('Avatar must be a valid URL').optional().transform(val => val?.trim()),
   bio: z.string().max(160, 'Bio must be 160 characters or less').optional().transform(val => val?.trim()),
   website: z.string().url('Website must be a valid URL').optional().transform(val => val?.trim()),

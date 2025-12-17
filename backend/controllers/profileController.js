@@ -40,6 +40,7 @@ const updateProfile = async (req, res) => {
   const {
     name,
     username,
+    email,
     avatar,
     bio,
     website,
@@ -57,11 +58,22 @@ const updateProfile = async (req, res) => {
       }
     }
 
+    if (email) {
+      const existingEmail = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingEmail && existingEmail.id !== userId) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         ...(name !== undefined && { name }),
         ...(username !== undefined && { username }),
+        ...(email !== undefined && { email }),
         ...(avatar !== undefined && { avatar }),
         ...(bio !== undefined && { bio }),
         ...(website !== undefined && { website }),

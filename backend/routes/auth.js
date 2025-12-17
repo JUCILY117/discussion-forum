@@ -1,12 +1,14 @@
 import express from 'express';
-import { register, login, refreshToken, logout } from '../controllers/authController.js';
+import { checkEmailAvailability, checkUsernameAvailability, login, logout, refreshToken, register, } from '../controllers/authController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { validate } from '../middleware/validationMiddleware.js';
-import { registerSchema, loginSchema } from '../validations/authSchema.js';
+import { loginSchema, registerSchema } from '../validations/authSchema.js';
 
 const router = express.Router();
 
 router.post('/register', validate(registerSchema), register);
+router.get('/check-username', checkUsernameAvailability);
+router.get("/check-email", checkEmailAvailability);
 router.post('/login', validate(loginSchema), login);
 router.post('/refresh-token', refreshToken);
 router.post('/logout', authMiddleware, logout);
