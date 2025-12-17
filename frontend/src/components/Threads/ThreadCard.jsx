@@ -1,6 +1,5 @@
-import React from "react";
-import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export default function ThreadCard({ thread }) {
   const { theme } = useTheme();
@@ -62,7 +61,40 @@ export default function ThreadCard({ thread }) {
           userSelect: "none",
         }}
       >
-        <span>by <strong>{thread.author?.username || "Unknown"}</strong></span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
+          by
+
+          {/* avatar */}
+          <span
+            style={{
+              width: "18px",
+              height: "18px",
+              borderRadius: "50%",
+              overflow: "hidden",
+              backgroundColor: theme.accentLight || "#ddd",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "0.65rem",
+              fontWeight: 700,
+              color: theme.textPrimary,
+              flexShrink: 0,
+            }}
+          >
+              <img
+                src={thread.author?.avatar || `https://ui-avatars.com/api/?name=${thread.author?.username}&background=random&size=64`}
+                alt={thread.author.username}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+          </span>
+
+          <strong>{thread.author?.username || "Unknown"}</strong>
+        </span>
+
         <span>•</span>
         <span>{thread.category?.name || "Uncategorized"}</span>
       </div>
