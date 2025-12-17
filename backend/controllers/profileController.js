@@ -68,6 +68,17 @@ const updateProfile = async (req, res) => {
         ...(location !== undefined && { location }),
         ...(bannerImage !== undefined && { bannerImage }),
       },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        avatar: true,
+        bio: true,
+        website: true,
+        location: true,
+        bannerImage: true,
+        createdAt: true,
+      },
     });
 
     res.json({ message: 'Profile updated', user: updatedUser });
@@ -87,7 +98,6 @@ const getPublicProfileByUsername = async (req, res) => {
         id: true,
         name: true,
         username: true,
-        email: true,
         avatar: true,
         bio: true,
         website: true,
@@ -106,4 +116,5 @@ const getPublicProfileByUsername = async (req, res) => {
   }
 };
 
-export { getProfile, updateProfile, getPublicProfileByUsername };
+export { getProfile, getPublicProfileByUsername, updateProfile };
+
