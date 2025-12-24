@@ -1,7 +1,7 @@
 import prisma from '../utils/prismaClient.js';
 
 export class FilterService {
-  
+
   static buildWhereConditions(filters) {
     const { category, tags, search } = filters;
     const whereConditions = {};
@@ -33,7 +33,7 @@ export class FilterService {
 
   static buildIncludeConditions() {
     return {
-      author: { select: { id: true, username: true } },
+      author: { select: { id: true, username: true, avatar: true } },
       category: { select: { id: true, name: true } },
       tags: { include: { tag: { select: { id: true, name: true } } } },
       votes: true
@@ -45,7 +45,7 @@ export class FilterService {
       const upvotes = thread.votes.filter(vote => vote.value === 1).length;
       const downvotes = thread.votes.filter(vote => vote.value === -1).length;
       const score = upvotes - downvotes;
-      
+
       return {
         ...thread,
         voteScore: score,
@@ -62,7 +62,7 @@ export class FilterService {
 
   static async getFilteredThreads(filters) {
     const { sort = 'recent', limit, page = 1 } = filters;
-    
+
     const whereConditions = this.buildWhereConditions(filters);
     const includeConditions = this.buildIncludeConditions();
 
@@ -74,7 +74,7 @@ export class FilterService {
     } else {
       orderBy = { createdAt: 'desc' };
     }
-    
+
     const threads = await prisma.thread.findMany({
       where: whereConditions,
       include: includeConditions,
@@ -84,9 +84,9 @@ export class FilterService {
     });
 
     const processedThreads = this.calculateVoteScores(threads);
-    
-    return sort === 'upvoted' 
-      ? this.sortByUpvotes(processedThreads) 
+
+    return sort === 'upvoted'
+      ? this.sortByUpvotes(processedThreads)
       : processedThreads;
   }
 }

@@ -1,5 +1,5 @@
-import prisma from '../utils/prismaClient.js';
 import { FilterService } from '../services/filterService.js';
+import prisma from '../utils/prismaClient.js';
 
 export const createThread = async (req, res) => {
   const { title, description, categoryId, tagNames = [] } = req.body;
@@ -66,7 +66,7 @@ export const getThreadById = async (req, res) => {
   try {
     const thread = await prisma.thread.findUnique({
       where: { id: parseInt(id) },
-      include: { author: { select: { id: true, username: true } }, votes: true, tags: { include: { tag: true } }, category: true },
+      include: { author: { select: { id: true, username: true, avatar: true } }, votes: true, tags: { include: { tag: true } }, category: true },
     });
     if (!thread) return res.status(404).json({ error: 'Thread not found' });
     res.json(thread);
@@ -97,7 +97,7 @@ export const deleteThread = async (req, res) => {
 export const addTagToThread = async (req, res) => {
   const { id } = req.params;
   const { tagName } = req.body;
-  
+
   if (!tagName) return res.status(400).json({ error: 'Missing tagName' });
 
   try {
