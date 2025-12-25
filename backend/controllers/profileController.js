@@ -32,20 +32,20 @@ const getProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.userId ?? req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const {
     name,
     username,
     email,
-    avatar,
+    avatar: avatarUrl,
     bio,
     website,
     location,
-    bannerImage,
+    bannerImage: bannerUrl,
   } = req.body;
 
   try {
@@ -54,7 +54,7 @@ const updateProfile = async (req, res) => {
         where: { username },
       });
       if (existingUser && existingUser.id !== userId) {
-        return res.status(400).json({ error: 'Username already taken' });
+        return res.status(400).json({ error: "Username already taken" });
       }
     }
 
@@ -62,10 +62,24 @@ const updateProfile = async (req, res) => {
       const existingEmail = await prisma.user.findUnique({
         where: { email },
       });
-
       if (existingEmail && existingEmail.id !== userId) {
         return res.status(400).json({ error: "Email already registered" });
       }
+    }
+
+    const baseUrl =
+      process.env.BASE_URL ||
+      `${req.protocol}://${req.get("host")}`;
+
+    let avatar = avatarUrl;
+    let bannerImage = bannerUrl;
+
+    if (req.files?.avatar?.[0]) {
+      avatar = `${baseUrl}/uploads/avatars/${req.files.avatar[0].filename}`;
+    }
+
+    if (req.files?.bannerImage?.[0]) {
+      bannerImage = `${baseUrl}/uploads/banners/${req.files.bannerImage[0].filename}`;
     }
 
     const updatedUser = await prisma.user.update({
@@ -84,6 +98,7 @@ const updateProfile = async (req, res) => {
         id: true,
         name: true,
         username: true,
+        email: true,
         avatar: true,
         bio: true,
         website: true,
@@ -93,10 +108,10 @@ const updateProfile = async (req, res) => {
       },
     });
 
-    res.json({ message: 'Profile updated', user: updatedUser });
+    res.json({ message: "Profile updated", user: updatedUser });
   } catch (error) {
-    console.error('Update profile error:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
+    console.error("Update profile error:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   }
 };
 

@@ -58,3 +58,5 @@ coverage/
 .next/
 out/
 .storybook/
+
+uploads/
