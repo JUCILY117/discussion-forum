@@ -1,12 +1,49 @@
-import { z } from 'zod';
+import { z } from "zod";
+
+const emptyToUndefined = z.literal("").transform(() => undefined);
 
 export const updateProfileSchema = z.object({
-  name: z.string().min(1, 'Name cannot be empty').max(100).optional().transform(val => val?.trim()),
-  username: z.string().min(2, 'Username must be at least 2 characters').max(30).optional().transform(val => val?.trim()),
-  email: z.string().email("Invalid email format").optional().transform((val) => val?.trim().toLowerCase()),
-  avatar: z.string().url('Avatar must be a valid URL').optional().transform(val => val?.trim()),
-  bio: z.string().max(160, 'Bio must be 160 characters or less').optional().transform(val => val?.trim()),
-  website: z.string().url('Website must be a valid URL').optional().transform(val => val?.trim()),
-  location: z.string().max(100, 'Location must be 100 characters or less').optional().transform(val => val?.trim()),
-  bannerImage: z.string().url('Banner image must be a valid URL').optional().transform(val => val?.trim()),
+  name: z
+    .string()
+    .min(1, "Name cannot be empty")
+    .max(100)
+    .optional()
+    .transform(v => v?.trim()),
+
+  username: z
+    .string()
+    .min(2, "Username must be at least 2 characters")
+    .max(30)
+    .optional()
+    .transform(v => v?.trim()),
+
+  email: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .transform(v => v?.trim().toLowerCase()),
+
+  avatar: z
+    .union([z.string().url(), emptyToUndefined])
+    .optional(),
+
+  bannerImage: z
+    .union([z.string().url(), emptyToUndefined])
+    .optional(),
+
+  website: z
+    .union([z.string().url(), emptyToUndefined])
+    .optional(),
+
+  bio: z
+    .string()
+    .max(160, "Bio must be 160 characters or less")
+    .optional()
+    .transform(v => v?.trim()),
+
+  location: z
+    .string()
+    .max(100, "Location must be 100 characters or less")
+    .optional()
+    .transform(v => v?.trim()),
 });
