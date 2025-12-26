@@ -16,6 +16,24 @@ export const profileApi = createApi({
         method: 'PUT',
         body,
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          dispatch(
+            profileApi.util.updateQueryData(
+              "getProfile",
+              undefined,
+              (draft) => {
+                if (draft?.user && data?.user) {
+                  Object.assign(draft.user, data.user);
+                }
+              }
+            )
+          );
+        } catch {
+        }
+      },
     }),
   }),
 });

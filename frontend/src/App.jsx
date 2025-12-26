@@ -1,14 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
-import { SocketProvider } from "./contexts/SocketContext";
-import { useGetUserQuery } from "./features/auth/authApi";
+import { Toaster } from "react-hot-toast";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import ViewThread from "./components/Threads/ViewThread";
+import { SocketProvider } from "./contexts/SocketContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { useGetUserQuery } from "./features/auth/authApi";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import SignupPage from "./pages/SignupPage";
 import ThreadsPage from "./pages/ThreadsPage";
-import ViewThread from "./components/Threads/ViewThread";
-import { Toaster } from "react-hot-toast";
 
 function InnerApp() {
   const { theme } = useTheme();
@@ -32,6 +33,7 @@ function InnerApp() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/threads" element={<ThreadsPage />} />
         <Route path="/threads/:threadId" element={<ViewThread />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <Toaster
         toastOptions={{
